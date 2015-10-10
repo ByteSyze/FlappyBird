@@ -13,7 +13,6 @@ public class BirdController : MonoBehaviour {
 
 	public float velocity;
 
-	public bool useAI = false;
 	public bool enableMaxJumpInterval = false;
 	
 	public float lastJumpTime;
@@ -30,8 +29,12 @@ public class BirdController : MonoBehaviour {
 	public float flapHeight = 200f;
 
 	private bool jump;
+	private bool shoot;
 
 	public GameObject positionVisualizer;
+
+	public GameObject laserTemplate;
+	public Transform laserShootLocation;
 
 	// Use this for initialization
 	void Start ()
@@ -44,6 +47,8 @@ public class BirdController : MonoBehaviour {
 	{
 		if (Input.GetMouseButtonDown (0))
 			jump = true;
+		if (Input.GetKeyDown(KeyCode.Space) && manager.isBossFight)
+			shoot = true;
 
 		birdBody.isKinematic = manager.gameOver;
 
@@ -54,7 +59,7 @@ public class BirdController : MonoBehaviour {
 	{
 		lastJumpTime++;
 
-		if (useAI) 
+		if (manager.useAI) 
 		{
 			foreach(PipeController p in pipes)
 			{
@@ -74,13 +79,25 @@ public class BirdController : MonoBehaviour {
 
 		if (jump && (lastJumpTime >= maxJumpInterval || !enableMaxJumpInterval))
 		{
-			if(!useAI || (useAI && birdBody.velocity.y < maxVelocity))
+			if(!manager.useAI || (manager.useAI && birdBody.velocity.y < maxVelocity))
 			{
 				birdBody.AddForce (Vector3.up * flapHeight);
 
 				jump = false;
 				lastJumpTime = 0;
 			}
+		}
+
+		if (shoot)
+		{
+			GameObject laser = Instantiate(laserTemplate);
+
+			laser.transform.rotation = laserShootLocation.rotation;
+			laser.transform.position = laserShootLocation.position;
+
+			laser.GetComponent<Laser>().destroyable = true;
+
+			shoot = false;
 		}
 
 		transform.eulerAngles = new Vector3 (birdBody.velocity.y * rotationMagnitude + rotationOffset, yRotation, zRotation);

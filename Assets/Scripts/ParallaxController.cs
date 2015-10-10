@@ -16,12 +16,14 @@ public class ParallaxController : MonoBehaviour {
 	public Vector3 vect;
 
 	// Use this for initialization
-	void Start () {
+	void Start ()
+	{
 		parallaxEnabled = true;
 	}
 	
 	// Update is called once per frame
-	void Update () {
+	void Update ()
+	{
 	
 	}
 
@@ -30,10 +32,12 @@ public class ParallaxController : MonoBehaviour {
 		if (!manager.gameOver && parallaxEnabled)
 		{
 			vect = transform.position;
-			if (vect.x < end) {
+			if (vect.x < end)
+			{
 				vect.x = start;
 				transform.position = vect;
-			} else {
+			} else 
+			{
 				vect.x += speed;
 				transform.position = vect;
 			}
