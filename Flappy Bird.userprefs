@@ -1,0 +1,15 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\BirdController.cs">
+    <Files>
+      <File FileName="Assets\Scripts\GameManager.cs" Line="18" Column="1" />
+      <File FileName="Assets\Scripts\BirdController.cs" Line="50" Column="34" />
+      <File FileName="Assets\Scripts\ParallaxController.cs" Line="1" Column="1" />
+      <File FileName="Assets\Scripts\PipeController.cs" Line="20" Column="5" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
