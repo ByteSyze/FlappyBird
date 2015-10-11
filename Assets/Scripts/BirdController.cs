@@ -3,6 +3,7 @@ using System.Collections;
 
 public class BirdController : MonoBehaviour
 {
+	public float health = 100f;
 
 	public BirdController enemy;
 
@@ -25,6 +26,10 @@ public class BirdController : MonoBehaviour
 	public float maxFlapInterval;
 	public float minVelocity; // The minimum velocity specifies when the AI must flap, regardless of any other factors.
 	public float maxVelocity; // The maximum velocity specifies when the AI must NOT flap.
+	
+	public float maxShootInterval = 2f;
+	public float shootIntervalVariance = 1f;
+	public float lastShootTime;
 
 	public float rotationMagnitude;
 	public float rotationOffset;
@@ -68,6 +73,7 @@ public class BirdController : MonoBehaviour
 	void FixedUpdate()
 	{
 		lastFlapTime++;
+		lastShootTime++;
 
 		if (useAI) 
 		{
@@ -127,6 +133,7 @@ public class BirdController : MonoBehaviour
 		//laser.verbose = true;
 		
 		shoot = false;
+		lastShootTime = 0;
 	}
 
 	/**

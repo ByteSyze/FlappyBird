@@ -48,6 +48,7 @@
   <ItemGroup>
      <Compile Include="Assets\Scripts\BirdController.cs" />
      <Compile Include="Assets\Scripts\EagleController.cs" />
+     <Compile Include="Assets\Scripts\ExplosionController.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\Laser.cs" />
      <Compile Include="Assets\Scripts\ParallaxController.cs" />

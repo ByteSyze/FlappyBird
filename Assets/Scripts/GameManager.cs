@@ -4,11 +4,12 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour 
 {
-
-	private const int StageDisplayText 	= 0;
-	private const int StageDestroyPipes = 1;
-	private const int StageMoveBird		= 2;
-	private const int StageDispatchBoss = 3;
+	public const int StageDisplayText 	= 0;
+	public const int StageDestroyPipes 	= 1;
+	public const int StageMoveBird		= 2;
+	public const int StageDispatchBoss 	= 3;
+	public const int StageStartMusic 	= 4;
+	public const int StageFinish		= 5;
 	
 	public const int Left = 1;
 	public const int Right = -1;
@@ -18,7 +19,7 @@ public class GameManager : MonoBehaviour
 	public float bossTriggerScore = 300f;
 	public bool isBossFight;
 
-	private int bossInitStage;
+	public int bossInitStage;
 
 	public BirdController bird;
 	public BirdController eagle;
@@ -33,6 +34,10 @@ public class GameManager : MonoBehaviour
 
 	public bool gameOver;
 
+	public GameObject explosionTemplate;
+
+	public AudioSource bossMusic;
+
 	// Use this for initialization
 	void Start ()
 	{
@@ -41,7 +46,7 @@ public class GameManager : MonoBehaviour
 		isBossFight = false;
 		gameOver = false;
 
-		bossInitStage = StageDestroyPipes;
+		bossInitStage = StageStartMusic;
 
 		bossBattleBirdPosition = bird.transform.position;
 		bossBattleBirdPosition.x -= 2f;
@@ -81,6 +86,11 @@ public class GameManager : MonoBehaviour
 		{
 			if(isBossFight)
 			{
+				if(bossInitStage == StageStartMusic)
+				{
+					bossMusic.Play();
+					bossInitStage = StageDestroyPipes;
+				}
 				if(bossInitStage == StageDisplayText)
 				{
 					bossFightText.text = "BOSS FIGHT! Hit SPACE to fire!";
@@ -114,7 +124,7 @@ public class GameManager : MonoBehaviour
 					}
 					else
 					{
-						bossInitStage = 5;
+						bossInitStage = StageFinish;
 					}
 				}
 			}
