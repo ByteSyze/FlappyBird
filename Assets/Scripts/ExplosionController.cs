@@ -9,6 +9,8 @@ public class ExplosionController : MonoBehaviour {
 	void Start ()
 	{
 		renderer = GetComponent<SpriteRenderer>();
+
+		GetComponent<AudioSource>().Play();
 	}
 	
 	// Update is called once per frame

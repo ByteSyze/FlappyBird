@@ -3,7 +3,10 @@ using System.Collections;
 
 public class BirdController : MonoBehaviour
 {
-	public float health = 100f;
+	public float maxHealth = 100f;
+	public float health;
+	
+	public HealthBar healthBar;
 
 	public BirdController enemy;
 
@@ -48,15 +51,22 @@ public class BirdController : MonoBehaviour
 
 	public int laserDirection = GameManager.Right;
 
+	public AudioSource flapSource;
+
 	// Use this for initialization
 	public void Start ()
 	{
 		birdBody = GetComponent<Rigidbody> ();
+		
+		health = maxHealth;
 	}
 	
 	// Update is called once per frame
 	public void Update ()
 	{
+		if(health <= 0)
+			manager.gameOver = true;
+
 		if(!useAI)
 		{
 			if (Input.GetMouseButtonDown (0))
@@ -113,6 +123,8 @@ public class BirdController : MonoBehaviour
 	public void Flap()
 	{
 		birdBody.AddForce (Vector3.up * flapHeight);
+
+		flapSource.Play();
 		
 		flap = false;
 		lastFlapTime = 0;
@@ -190,22 +202,38 @@ public class BirdController : MonoBehaviour
 		transform.eulerAngles = new Vector3 (birdBody.velocity.y * rotationMagnitude + rotationOffset, yRotation, zRotation);
 	}
 
+	public void OnLaserHit(Collision laser)
+	{
+		GameObject explosion = (GameObject)Instantiate(manager.explosionTemplate, laser.contacts[0].point, manager.explosionTemplate.transform.rotation);
+		explosion.AddComponent(typeof(ExplosionController));
+		Destroy(laser.gameObject);
+		
+		health -= 10f;
+	}
+
 	public void OnCollisionEnter(Collision other)
 	{
-		bool isGoodGuy = false;
-
-		for (int i = 0; i < friendlyColliders.Length; i++)
+		if(other.collider.name.Contains("Laser"))
 		{
-			if(other.collider == friendlyColliders[i])
-			{
-				isGoodGuy = true;
-				break;
-			}
+			OnLaserHit(other);
 		}
-
-		if (!isGoodGuy)
+		else
 		{
-			manager.gameOver = true;
+			bool isGoodGuy = false;
+
+			for (int i = 0; i < friendlyColliders.Length; i++)
+			{
+				if(other.collider == friendlyColliders[i])
+				{
+					isGoodGuy = true;
+					break;
+				}
+			}
+
+			if (!isGoodGuy)
+			{
+				manager.gameOver = true;
+			}
 		}
 	}
 }

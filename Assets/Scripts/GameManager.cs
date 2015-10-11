@@ -94,6 +94,9 @@ public class GameManager : MonoBehaviour
 				if(bossInitStage == StageDisplayText)
 				{
 					bossFightText.text = "BOSS FIGHT! Hit SPACE to fire!";
+					bird.healthBar.display = true;
+					eagle.healthBar.display = true;
+
 					bossInitStage = StageMoveBird;
 				}
 				else if(bossInitStage == StageDestroyPipes)
