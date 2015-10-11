@@ -1,25 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class BirdController : MonoBehaviour {
+public class BirdController : MonoBehaviour
+{
+
+	public BirdController enemy;
 
 	public GameManager manager;
+
+	public bool useAI;
 	
 	public Collider[] friendlyColliders;
 
 	public PipeController[] pipes;
 
-	Rigidbody birdBody;
+	public Rigidbody birdBody;
 
 	public float velocity;
 
-	public bool enableMaxJumpInterval = false;
+	public bool enableMaxFlapInterval = false;
 	
-	public float lastJumpTime;
+	public float lastFlapTime;
 
-	public float maxJumpInterval;
-	public float minVelocity; // The minimum velocity specifies when the AI must jump, regardless of any other factors.
-	public float maxVelocity; // The maximum velocity specifies when the AI must NOT jump.
+	public float maxFlapInterval;
+	public float minVelocity; // The minimum velocity specifies when the AI must flap, regardless of any other factors.
+	public float maxVelocity; // The maximum velocity specifies when the AI must NOT flap.
 
 	public float rotationMagnitude;
 	public float rotationOffset;
@@ -28,27 +33,32 @@ public class BirdController : MonoBehaviour {
 
 	public float flapHeight = 200f;
 
-	private bool jump;
-	private bool shoot;
+	public bool flap;
+	public bool shoot;
 
 	public GameObject positionVisualizer;
 
 	public GameObject laserTemplate;
 	public Transform laserShootLocation;
 
+	public int laserDirection = GameManager.Right;
+
 	// Use this for initialization
-	void Start ()
+	public void Start ()
 	{
 		birdBody = GetComponent<Rigidbody> ();
 	}
 	
 	// Update is called once per frame
-	void Update ()
+	public void Update ()
 	{
-		if (Input.GetMouseButtonDown (0))
-			jump = true;
-		if (Input.GetKeyDown(KeyCode.Space) && manager.isBossFight)
-			shoot = true;
+		if(!useAI)
+		{
+			if (Input.GetMouseButtonDown (0))
+				flap = true;
+			if (Input.GetKeyDown(KeyCode.Space) && manager.isBossFight)
+				shoot = true;
+		}
 
 		birdBody.isKinematic = manager.gameOver;
 
@@ -57,9 +67,9 @@ public class BirdController : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		lastJumpTime++;
+		lastFlapTime++;
 
-		if (manager.useAI) 
+		if (useAI) 
 		{
 			foreach(PipeController p in pipes)
 			{
@@ -71,35 +81,105 @@ public class BirdController : MonoBehaviour {
 
 					if((target.y > transform.position.y) || (birdBody.velocity.y < minVelocity))
 					{
-						jump = true;
+						flap = true;
 					}
 				}
 			}
 		} 
 
-		if (jump && (lastJumpTime >= maxJumpInterval || !enableMaxJumpInterval))
+		if (flap && (lastFlapTime >= maxFlapInterval || !enableMaxFlapInterval))
 		{
-			if(!manager.useAI || (manager.useAI && birdBody.velocity.y < maxVelocity))
+			if(!useAI || (useAI && birdBody.velocity.y < maxVelocity))
 			{
-				birdBody.AddForce (Vector3.up * flapHeight);
-
-				jump = false;
-				lastJumpTime = 0;
+				Flap();
 			}
 		}
 
 		if (shoot)
 		{
-			GameObject laser = Instantiate(laserTemplate);
-
-			laser.transform.rotation = laserShootLocation.rotation;
-			laser.transform.position = laserShootLocation.position;
-
-			laser.GetComponent<Laser>().destroyable = true;
-
-			shoot = false;
+			Shoot();
 		}
 
+		HandleRotation();
+		//GetDangerousLasers();
+	}
+
+	public void Flap()
+	{
+		birdBody.AddForce (Vector3.up * flapHeight);
+		
+		flap = false;
+		lastFlapTime = 0;
+	}
+
+	public void Shoot()
+	{
+		GameObject laserObj = Instantiate(laserTemplate);
+		
+		laserObj.transform.rotation = laserShootLocation.rotation;
+		laserObj.transform.position = laserShootLocation.position;
+
+		Laser laser = laserObj.GetComponent<Laser>();
+
+		laser.destroyable = true;
+		laser.source = this;
+		laser.direction = laserDirection;
+		//laser.verbose = true;
+		
+		shoot = false;
+	}
+
+	/**
+	 *	Returns a list of lasers that might actually hit this bird.
+	 *
+	 *	The list only returns lasers that are noticeably dangerous,
+	 *	i.e. there is no foresight.
+	 **/
+	public ArrayList GetDangerousLasers()
+	{
+		Laser[] lasers = GameObject.FindObjectsOfType<Laser>();
+		ArrayList dangerousLasers = new ArrayList();
+
+		foreach(Laser laser in lasers)
+		{
+			//Check that the laser wasn't shot by us.
+			if(laser.source != this)
+			{
+				if(laser.IsDangerousTo(birdBody))
+				{
+					dangerousLasers.Add(laser);
+				}
+			}
+		}
+
+		return dangerousLasers;
+	}
+
+	public Laser GetMostDangerousLaser(ArrayList lasers)
+	{
+		
+		ArrayList dangerousLasers = GetDangerousLasers();
+		
+		float smallestDifference = Mathf.Infinity;
+		Laser mostDangerousLaser = null;
+		
+		foreach(Laser laser in dangerousLasers)
+		{
+			//Avoid the lasers!
+			Vector3 difference = laser.transform.position - transform.position;
+			
+			if(difference.sqrMagnitude < smallestDifference)
+			{
+				smallestDifference = difference.sqrMagnitude;
+				mostDangerousLaser = laser;
+			}
+		}
+
+		return mostDangerousLaser;
+	}
+
+	public void HandleRotation()
+	{
 		transform.eulerAngles = new Vector3 (birdBody.velocity.y * rotationMagnitude + rotationOffset, yRotation, zRotation);
 	}
 

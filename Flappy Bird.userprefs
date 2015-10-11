@@ -1,12 +1,11 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\BirdController.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Scripts\EagleController.cs">
     <Files>
-      <File FileName="Assets\Scripts\GameManager.cs" Line="35" Column="2" />
-      <File FileName="Assets\Scripts\BirdController.cs" Line="96" Column="58" />
-      <File FileName="Assets\Scripts\ParallaxController.cs" Line="36" Column="4" />
-      <File FileName="Assets\Scripts\PipeController.cs" Line="17" Column="8" />
-      <File FileName="Assets\Scripts\Laser.cs" Line="32" Column="24" />
+      <File FileName="Assets\Scripts\BirdController.cs" Line="126" Column="36" />
+      <File FileName="Assets\Scripts\GameManager.cs" Line="14" Column="30" />
+      <File FileName="Assets\Scripts\Laser.cs" Line="51" Column="1" />
+      <File FileName="Assets\Scripts\EagleController.cs" Line="67" Column="3" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

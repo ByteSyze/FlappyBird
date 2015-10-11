@@ -14,7 +14,7 @@ public class PipeController : ParallaxController
 		if (vect.x == start)
 		{
 
-			if(manager.isBossFight && !manager.useAI)
+			if(manager.isBossFight && !manager.bird.useAI)
 			{
 				Destroy(gameObject);
 			}
