@@ -58,7 +58,7 @@ public class EagleController : BirdController
 					}
 				}
 
-				if(manager.bossInitStage == GameManager.StageFinish)
+				if(manager.bossStage == GameManager.StageInitFinish)
 				{
 					RaycastHit enemyHit;
 
@@ -77,6 +77,20 @@ public class EagleController : BirdController
 
 				if(shoot)
 					Shoot ();
+			}
+			else
+			{
+				if(Time.time - timeOfDeath > 2f)
+				{
+					GameObject explosion = (GameObject)Instantiate(manager.explosionTemplate, transform.position, manager.explosionTemplate.transform.rotation);
+					explosion.AddComponent(typeof(ExplosionController));
+
+					manager.isBossFight = false;
+					manager.bossStage = GameManager.StageDisplayWin;
+
+					Destroy(healthBar.gameObject);
+					Destroy(gameObject);
+				}
 			}
 			HandleRotation();
 		}

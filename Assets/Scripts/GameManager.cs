@@ -4,12 +4,21 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour 
 {
+	//Boss start stages
 	public const int StageDisplayText 	= 0;
-	public const int StageDestroyPipes 	= 1;
+	public const int StageHidePipes 	= 1;
 	public const int StageMoveBird		= 2;
 	public const int StageDispatchBoss 	= 3;
 	public const int StageStartMusic 	= 4;
-	public const int StageFinish		= 5;
+	public const int StageInitFinish	= 5;
+
+	//Boss end stages
+	public const int StageDisplayWin	= 6;
+	public const int StageStopMusic		= 7;
+	public const int StageMoveBirdBack 	= 8;
+	public const int StageShowPipes		= 9;
+	public const int StageHideText		= 10;
+	public const int StageDefeatFinish 	= 11;
 	
 	public const int Left = 1;
 	public const int Right = -1;
@@ -19,12 +28,12 @@ public class GameManager : MonoBehaviour
 	public float bossTriggerScore = 300f;
 	public bool isBossFight;
 
-	public int bossInitStage;
+	public int bossStage;
 
 	public BirdController bird;
 	public BirdController eagle;
 
-	public Vector3 bossBattleBirdPosition; //The position of the bird once a boss battle has begun.
+	public Vector3 normalBirdPosition, bossBattleBirdPosition; //The position of the bird once a boss battle has begun.
 	public Vector3 bossBattleEaglePosition; //The position of the eagle once a boss battle has begun.
 
 	public float score = 0;
@@ -46,13 +55,15 @@ public class GameManager : MonoBehaviour
 		isBossFight = false;
 		gameOver = false;
 
-		bossInitStage = StageStartMusic;
+		bossStage = StageStartMusic;
 
 		bossBattleBirdPosition = bird.transform.position;
 		bossBattleBirdPosition.x -= 2f;
 
 		bossBattleEaglePosition = eagle.transform.position;
 		bossBattleEaglePosition.x = 1.7f;
+
+		normalBirdPosition = bird.transform.position;
 	}
 	
 	// Update is called once per frame
@@ -86,27 +97,37 @@ public class GameManager : MonoBehaviour
 		{
 			if(isBossFight)
 			{
-				if(bossInitStage == StageStartMusic)
+				if(bossStage == StageStartMusic)
 				{
 					bossMusic.Play();
-					bossInitStage = StageDestroyPipes;
+					bossStage = StageHidePipes;
 				}
-				if(bossInitStage == StageDisplayText)
+				if(bossStage == StageDisplayText)
 				{
 					bossFightText.text = "BOSS FIGHT! Hit SPACE to fire!";
 					bird.healthBar.display = true;
 					eagle.healthBar.display = true;
 
-					bossInitStage = StageMoveBird;
+					bossStage = StageMoveBird;
 				}
-				else if(bossInitStage == StageDestroyPipes)
+				else if(bossStage == StageHidePipes)
 				{
-					if(GameObject.FindObjectsOfType<PipeController>().Length == 0)
+					bool pipesHidden = true;
+					foreach(PipeController pipe in GameObject.FindObjectsOfType<PipeController>())
 					{
-						bossInitStage = StageDisplayText;
+						if(!pipe.hidden)
+						{
+							pipe.Hide ();
+							pipesHidden = false;
+							break;
+						}
+					}
+					if(pipesHidden)
+					{
+						bossStage = StageDisplayText;
 					}
 				}
-				else if(bossInitStage == StageMoveBird)
+				else if(bossStage == StageMoveBird)
 				{
 					if(bird.transform.position.x != bossBattleBirdPosition.x)
 					{
@@ -115,10 +136,10 @@ public class GameManager : MonoBehaviour
 					}
 					else
 					{
-						bossInitStage = StageDispatchBoss;
+						bossStage = StageDispatchBoss;
 					}
 				}
-				else if(bossInitStage == StageDispatchBoss)
+				else if(bossStage == StageDispatchBoss)
 				{
 					if(eagle.transform.position.x != bossBattleEaglePosition.x)
 					{
@@ -127,14 +148,71 @@ public class GameManager : MonoBehaviour
 					}
 					else
 					{
-						bossInitStage = StageFinish;
+						bossStage = StageInitFinish;
 					}
 				}
 			}
 			else
 			{
-				if(score >= bossTriggerScore)
+				if(score >= bossTriggerScore && bossStage == StageStartMusic)
 					isBossFight = true;
+
+				if(bossStage == StageDisplayWin)
+				{
+					bossFightText.text = "BOSS DEFEATED! You may return to your pointless life of inevitable doom!";
+
+					bossStage = StageStopMusic;
+				}
+				else if(bossStage == StageStopMusic)
+				{
+					if(bossMusic.isPlaying)
+					{
+						//Fade the music out.
+						if(bossMusic.volume > .05f)
+							bossMusic.volume -= .002f;
+						else
+						{
+							bossMusic.Stop();
+							bossStage = StageMoveBirdBack;
+						}
+					}
+				}
+				else if(bossStage == StageMoveBirdBack)
+				{
+					bird.healthBar.display = false;
+
+					if(bird.transform.position.x != normalBirdPosition.x)
+					{
+						Vector3 newPos = Vector3.MoveTowards(bird.transform.position, normalBirdPosition, .05f);
+						bird.transform.position = newPos;
+					}
+					else
+					{
+						bossStage = StageShowPipes;
+					}
+				}
+				else if(bossStage == StageShowPipes)
+				{
+					bool pipesShown = true;
+					foreach(PipeController pipe in GameObject.FindObjectsOfType<PipeController>())
+					{
+						if(pipe.hidden)
+						{
+							pipe.Show ();
+							pipesShown = false;
+							break;
+						}
+					}
+					if(pipesShown)
+					{
+						bossStage = StageHideText;
+					}
+				}
+				else if(bossStage == StageHideText)
+				{
+					bossFightText.text = "";
+					bossStage = StageDefeatFinish;
+				}
 			}
 
 			score += .05f;

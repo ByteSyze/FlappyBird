@@ -8,6 +8,8 @@ public class BirdController : MonoBehaviour
 	
 	public HealthBar healthBar;
 
+	public float timeOfDeath;
+
 	public BirdController enemy;
 
 	public GameManager manager;
@@ -64,9 +66,6 @@ public class BirdController : MonoBehaviour
 	// Update is called once per frame
 	public void Update ()
 	{
-		if(health <= 0)
-			manager.gameOver = true;
-
 		if(!useAI)
 		{
 			if (Input.GetMouseButtonDown (0))
@@ -84,6 +83,9 @@ public class BirdController : MonoBehaviour
 	{
 		lastFlapTime++;
 		lastShootTime++;
+
+		if(health <= 0)
+			manager.gameOver = true;
 
 		if (useAI) 
 		{
@@ -209,6 +211,9 @@ public class BirdController : MonoBehaviour
 		Destroy(laser.gameObject);
 		
 		health -= 10f;
+
+		if(health <= 0)
+			timeOfDeath = Time.time;
 	}
 
 	public void OnCollisionEnter(Collision other)
