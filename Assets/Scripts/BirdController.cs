@@ -241,4 +241,9 @@ public class BirdController : MonoBehaviour
 			}
 		}
 	}
+	
+	void OnTriggerEnter(Collider other)
+	{
+		manager.score += 1;
+	}
 }

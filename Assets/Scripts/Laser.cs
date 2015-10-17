@@ -32,8 +32,7 @@ public class Laser : MonoBehaviour
 
 	void FixedUpdate()
 	{
-		if(id != 0)
-			transform.position += (transform.right * .5f) * direction;
+		transform.position += (transform.right * .5f) * direction;
 	}
 
 	public bool IsDangerousTo(Rigidbody rb)

@@ -215,7 +215,7 @@ public class GameManager : MonoBehaviour
 				}
 			}
 
-			score += .05f;
+			//score += .05f;
 			scoreText.text = "" + Mathf.RoundToInt(score);
 		}
 	}
