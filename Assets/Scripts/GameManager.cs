@@ -20,12 +20,14 @@ public class GameManager : MonoBehaviour
 	public const int StageHideText		= 10;
 	public const int StageDefeatFinish 	= 11;
 	
+	public GameObject bossPrefab;
+	
 	public const int Left = 1;
 	public const int Right = -1;
 
 	public static float HighScore = 0;
 
-	public float bossTriggerScore = 300f;
+	public float bossTriggerInterval = 300f;
 	public bool isBossFight;
 
 	public int bossStage;
@@ -33,6 +35,7 @@ public class GameManager : MonoBehaviour
 	public BirdController bird;
 	public BirdController eagle;
 
+	public Transform bossSpawnTransform;
 	public Vector3 normalBirdPosition, bossBattleBirdPosition; //The position of the bird once a boss battle has begun.
 	public Vector3 bossBattleEaglePosition; //The position of the eagle once a boss battle has begun.
 
@@ -60,8 +63,9 @@ public class GameManager : MonoBehaviour
 		bossBattleBirdPosition = bird.transform.position;
 		bossBattleBirdPosition.x -= 2f;
 
-		bossBattleEaglePosition = eagle.transform.position;
+		bossBattleEaglePosition = Vector3.zero;
 		bossBattleEaglePosition.x = 1.7f;
+		bossBattleEaglePosition.z = bird.transform.position.z;
 
 		normalBirdPosition = bird.transform.position;
 	}
@@ -95,7 +99,7 @@ public class GameManager : MonoBehaviour
 		}
 		else
 		{
-			if(isBossFight)
+			if(isBossFight && !bird.useAI)
 			{
 				if(bossStage == StageStartMusic)
 				{
@@ -105,6 +109,17 @@ public class GameManager : MonoBehaviour
 				if(bossStage == StageDisplayText)
 				{
 					bossFightText.text = "BOSS FIGHT! Hit SPACE to fire!";
+
+					eagle = SpawnEagle();
+
+					eagle.manager = this;
+					eagle.enemy = bird;
+
+					eagle.healthBar = ((GameObject)Instantiate(eagle.healthBarPrefab, eagle.transform.position, eagle.healthBarPrefab.transform.rotation)).GetComponent<HealthBar>();
+					eagle.healthBar.owner = eagle;
+					eagle.healthBar.manager = this;
+					eagle.healthBar.transform.SetParent(GameObject.FindObjectOfType<Canvas>().transform);
+
 					bird.healthBar.display = true;
 					eagle.healthBar.display = true;
 
@@ -154,7 +169,7 @@ public class GameManager : MonoBehaviour
 			}
 			else
 			{
-				if(score >= bossTriggerScore && bossStage == StageStartMusic)
+				if(score % bossTriggerInterval == 0 && bossStage == StageStartMusic)
 					isBossFight = true;
 
 				if(bossStage == StageDisplayWin)
@@ -211,13 +226,18 @@ public class GameManager : MonoBehaviour
 				else if(bossStage == StageHideText)
 				{
 					bossFightText.text = "";
-					bossStage = StageDefeatFinish;
+					bossStage = StageStartMusic;
 				}
 			}
 
 			//score += .05f;
 			scoreText.text = "" + Mathf.RoundToInt(score);
 		}
+	}
+	
+	public EagleController SpawnEagle()
+	{
+		return ((GameObject)Instantiate(bossPrefab, bossSpawnTransform.position, bossSpawnTransform.rotation)).GetComponent<EagleController>();
 	}
 
 	public void OnLevelWasLoaded()

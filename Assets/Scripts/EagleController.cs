@@ -6,6 +6,7 @@ public class EagleController : BirdController
 	public Vector3 eagleTarget;
 	
 	public float eagleTargetOffset = 2f; //Vertical offset
+	public float eaglePathMultiplier = 2f;
 
 	public void Start()
 	{
@@ -22,7 +23,7 @@ public class EagleController : BirdController
 			{
 				lastShootTime++;
 				
-				eagleTarget.y = Mathf.Sin(Time.time)*2f + eagleTargetOffset;
+				eagleTarget.y = Mathf.Sin(Time.time)*eaglePathMultiplier + eagleTargetOffset;
 
 				if (transform.position.y < eagleTarget.y && (lastFlapTime >= maxFlapInterval))
 				{
@@ -80,7 +81,7 @@ public class EagleController : BirdController
 			}
 			else
 			{
-				if(Time.time - timeOfDeath > 2f)
+				if(Time.time - timeOfDeath > 2f) //Blow up the eagle after 2 seconds.
 				{
 					GameObject explosion = (GameObject)Instantiate(manager.explosionTemplate, transform.position, manager.explosionTemplate.transform.rotation);
 					explosion.AddComponent(typeof(ExplosionController));

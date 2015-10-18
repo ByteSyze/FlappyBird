@@ -5,8 +5,11 @@ public class BirdController : MonoBehaviour
 {
 	public float maxHealth = 100f;
 	public float health;
-	
+
+	public GameObject healthBarPrefab;
 	public HealthBar healthBar;
+	
+	public float healthBarXOffset, healthBarYOffset;
 
 	public float timeOfDeath;
 
@@ -206,8 +209,8 @@ public class BirdController : MonoBehaviour
 
 	public void OnLaserHit(Collision laser)
 	{
-		GameObject explosion = (GameObject)Instantiate(manager.explosionTemplate, laser.contacts[0].point, manager.explosionTemplate.transform.rotation);
-		explosion.AddComponent(typeof(ExplosionController));
+		Instantiate(manager.explosionTemplate, laser.contacts[0].point, manager.explosionTemplate.transform.rotation);
+
 		Destroy(laser.gameObject);
 		
 		health -= 10f;

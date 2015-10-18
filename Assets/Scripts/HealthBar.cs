@@ -32,6 +32,10 @@ public class HealthBar : MonoBehaviour {
 		healthRect.localScale = new Vector3(owner.health/owner.maxHealth, 1, 1);
 
 		Vector2 pos = owner.transform.position;  // get the game object position
+
+		pos.x += owner.healthBarXOffset;
+		pos.y += owner.healthBarYOffset;
+
 		Vector2 viewportPoint = Camera.main.WorldToViewportPoint(pos);  //convert game object position to VievportPoint
 		
 		// set MIN and MAX Anchor values(positions) to the same position (ViewportPoint)
